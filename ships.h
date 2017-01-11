@@ -7,10 +7,12 @@ class Ship
 {
 
 public:
-    Ship(const Point& First, bool horizont, const int lenght);
     Ship();
+    Ship(const Point& First, bool horizont, const int lenght);
     Ship(const Ship&);
-    ~Ship() {}
+    ~Ship(){}
+
+    Ship& operator=(const Ship&);
 
     bool horizont() const
     {

@@ -105,17 +105,15 @@ void SeaGame::GameLoop()
 
 void SeaGame::PlayerShoot(const Point& In)
 {
-    Point p = ComputerField->operator [](In);
-
     Ship FindShip;
 
-    if (!ComputerField->FindShipByPoint(p,FindShip))
+    if (!ComputerField->FindShipByPoint(In,FindShip))
         return;
 
-    Point& deck = FindShip.getDeckByPoint(p);
+    //Point& deck = FindShip.getDeckByPoint(In);
 
     //пробиваем палубу
-    deck.fill = true;
+    //deck.fill = true;
 
 }
 
