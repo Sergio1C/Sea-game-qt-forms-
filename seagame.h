@@ -158,17 +158,13 @@ public:
 
     }
 
-    const QList<Ship> getShip(const int lenghtOfShip = 0)const
+    const QList<Ship> getShip(const int lenghtOfShip = 0) const
     {
-        if (lenghtOfShip == 0)
-        {
-            return _ships.values();
-        }
 
-        return _ships.values(lenghtOfShip);
+        //return _ships.values(lenghtOfShip);
     }
 
-    bool FindShipByPoint(const Point& p,Ship& Result) const
+    bool FindShipByPoint(const Point& p, Ship& Result) const
     {
         for (Ship ship: _ships)
         {
@@ -176,8 +172,8 @@ public:
 
                 if (p == _p)
                 {
-                    Result = ship;
-                    return true;
+                   Result = ship;
+                   return true;
                 }
         }
 
@@ -287,13 +283,6 @@ public:
            _ships.insert(filled,Ship(FirstPoint,false,filled));
            filled = 0;
        }
-
-    }
-
-
-
-    void Shoot(const Point& p)
-    {
 
     }
 

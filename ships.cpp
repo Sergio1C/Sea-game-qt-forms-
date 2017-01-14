@@ -34,16 +34,39 @@ Ship::Ship(const Ship& SomeShip)
     }
 }
 
-Ship& Ship::operator =(const Ship& SomeShip)
+bool Ship::operator==(const Ship& SomeShip)
 {
- if (*this == SomeShip)
-     return *this;
+    for (Point p1 : getPoints())
+     {
+        for (Point p : SomeShip.getPoints())
+        {
+           if (p1 != p ) return false;
+        }
+    }
+    return true;
+}
 
- _points.swap(SomeShip.getPoints());
- _decks.swap(SomeShip.getDecks());
+bool Ship::operator!=(const Ship& SomeShip)
+{
+    return !(*this == SomeShip);
+}
 
- return *this;
 
+Ship& Ship::operator=(Ship& SomeShip)
+{
+
+    if (*this != const_cast<const Ship&>(SomeShip))
+    {
+        _points.clear();
+        for (Point p : SomeShip.getPoints())
+            _points.push_back(p);
+
+        _decks.clear();
+        for (Point p : SomeShip.getDecks())
+            _decks.push_back(p);
+    }
+
+    return * this;
 }
 
 bool Ship::IsBroken() const

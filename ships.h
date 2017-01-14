@@ -12,7 +12,10 @@ public:
     Ship(const Ship&);
     ~Ship(){}
 
-    Ship& operator=(const Ship&);
+    bool operator==(const Ship&);
+    bool operator!=(const Ship&);
+
+    Ship& operator=(Ship&);
 
     bool horizont() const
     {
