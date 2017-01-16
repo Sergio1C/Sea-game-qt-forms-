@@ -36,7 +36,10 @@ Ship::Ship(const Ship& SomeShip)
 
 bool Ship::operator==(const Ship& SomeShip)
 {
-    for (Point p1 : getPoints())
+	if (this->getLenght() == 0)
+		return false;
+	
+	for (Point p1 : getPoints())
      {
         for (Point p : SomeShip.getPoints())
         {
@@ -51,20 +54,33 @@ bool Ship::operator!=(const Ship& SomeShip)
     return !(*this == SomeShip);
 }
 
+Point& Ship::getDeckByPoint(const Point& p)
+{
+	QVector<Point>::iterator FindPoint = std::find(_decks.begin(), _decks.end(), p);
+	return *FindPoint;
+}
 
-Ship& Ship::operator=(Ship& SomeShip)
+void Ship::setDeckByPoint(const Point& p, bool fill = true)
+{
+	QVector<Point>::iterator FindPoint = std::find(_decks.begin(), _decks.end(), p);
+	
+	if (FindPoint != _decks.end())
+		FindPoint->fill = fill;
+}
+
+Ship Ship::operator=(Ship& SomeShip)
 {
 
     if (*this != const_cast<const Ship&>(SomeShip))
     {
         _points.clear();
-        for (Point p : SomeShip.getPoints())
-            _points.push_back(p);
+		for (Point p : SomeShip.getPoints())
+			_points.push_back(std::move(p));
 
         _decks.clear();
         for (Point p : SomeShip.getDecks())
-            _decks.push_back(p);
-    }
+            _decks.push_back(std::move(p));	
+	}
 
     return * this;
 }

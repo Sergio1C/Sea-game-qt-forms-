@@ -15,7 +15,7 @@ public:
     bool operator==(const Ship&);
     bool operator!=(const Ship&);
 
-    Ship& operator=(Ship&);
+    Ship operator=(Ship&);
 
     bool horizont() const
     {
@@ -39,18 +39,21 @@ public:
         return _decks;
     }
 
-    Point& getDeckByPoint(Point& p)
-    {
-        QVector<Point>::iterator FindPoint = std::find(_decks.begin(), _decks.end(), p);
-        return *FindPoint;
-    }
+	Point& getDeckByPoint(const Point& p);
+
+	void setDeckByPoint(const Point& p, bool fill);
 
     int getLenght() const
     {
       return _points.count();
     }
-
-
+		
+	void clear()
+	{
+		_points.clear();
+		_decks.clear();
+	}
+	
 private:
     QVector<Point> _points; //точки на поле,определяют местоположение
     QVector<Point> _decks;  //палубы, те же точки, но определяют повреждения корабля

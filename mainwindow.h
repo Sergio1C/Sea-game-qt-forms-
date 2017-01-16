@@ -22,7 +22,6 @@ public:
 private:
     Ui::MainWindow *ui;
     SeaGame* game;
-    QSignalMapper* signalMapper;
     void PrepareForm();
 
 private slots:
@@ -35,6 +34,8 @@ private slots:
     void on_tableWidgetRight_cellClicked(int row, int column);
 
     void on_pushButton_clicked();
+
+    void on_pushButtonRight_clicked();
 
 public slots:
     void repaint();

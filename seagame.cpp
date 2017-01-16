@@ -13,26 +13,25 @@ void SeaGame::initializeFields()
     qsrand(seed);
 
     //4-палубные
-    SetShip(4);
+    SetShip(4, ComputerField);
 
     //3-палубные
-    SetShip(3);
-    SetShip(3);
+    SetShip(3, ComputerField);
+	SetShip(3, ComputerField);
 
     //2-палубные
-    SetShip(2);
-    SetShip(2);
-    SetShip(2);
+    SetShip(2, ComputerField);
+	SetShip(2, ComputerField);
+	SetShip(2, ComputerField);
 
     //1-палубные
-    SetShip(1);
-    SetShip(1);
-    SetShip(1);
-    SetShip(1);
-
+	SetShip(1, ComputerField);
+	SetShip(1, ComputerField);
+	SetShip(1, ComputerField);
+	SetShip(1, ComputerField);
 }
 
-void SeaGame::SetShip(const int lenght)
+void SeaGame::SetShip(const int lenght, SeaField* To)
 {
     while (true)
     {
@@ -43,12 +42,31 @@ void SeaGame::SetShip(const int lenght)
         Point FirstPoint(pos);
         Ship SomeShip(FirstPoint, horizont, lenght);
 
-        if (!ComputerField->CheckShip(SomeShip)) continue;
-        ComputerField->SetShip(SomeShip);
+        if (!To->CheckShip(SomeShip)) continue;
+        To->SetShip(SomeShip);
 
         return;
     };
 
+}
+
+void SeaGame::SetPlayerShip()
+{
+	SetShip(4, PlayerField);
+	
+	SetShip(3, PlayerField);
+	SetShip(3, PlayerField);
+	
+	SetShip(2, PlayerField);
+	SetShip(2, PlayerField);
+	SetShip(2, PlayerField);
+
+	SetShip(1, PlayerField);
+	SetShip(1, PlayerField);
+	SetShip(1, PlayerField);
+	SetShip(1, PlayerField);
+
+	PlayerField->scanShips();
 }
 
 bool SeaGame::PlayerIsReady() const
@@ -105,26 +123,22 @@ void SeaGame::GameLoop()
 
 void SeaGame::PlayerShoot(const Point& In)
 {
-    Ship FindShip;
+    Ship* FindShip;
 
     if (!ComputerField->FindShipByPoint(In,FindShip))
         return;
-
-    //Point& deck = FindShip.getDeckByPoint(In);
-
-    //пробиваем палубу
-    //deck.fill = true;
-
+	//пробиваем палубу
+	FindShip->setDeckByPoint(In, true);				
 }
 
 bool SeaGame::EndOfGame() const
 {
-    for (Ship s : PlayerField->getShip())
+    for (const Ship& s : PlayerField->getShip())
     {
         if (!(s.IsBroken())) return false;
     }
 
-    for (Ship s : ComputerField->getShip())
+    for (const Ship& s : ComputerField->getShip())
     {
         if (!(s.IsBroken())) return false;
     }

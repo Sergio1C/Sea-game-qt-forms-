@@ -158,22 +158,38 @@ public:
 
     }
 
-    const QList<Ship> getShip(const int lenghtOfShip = 0) const
-    {
+    const QList<Ship>& getShip(const int lenghtOfShip = 0) const
+	{
+		if (lenghtOfShip == 0)
+		{
+			QList<Ship> &ref = _ships.values();
+			return ref;
+		}
+		QList<Ship> & ref = _ships.values(lenghtOfShip);
+		return ref;
+	}
 
-        //return _ships.values(lenghtOfShip);
-    }
+	QList<Ship>& getShip(const int lenghtOfShip = 0)
+	{
+		if (lenghtOfShip == 0)
+		{
+			QList<Ship> &ref = _ships.values();
+			return ref;
+		}		 
+			QList<Ship> & ref = _ships.values(lenghtOfShip);
+			return ref;
+	}
 
-    bool FindShipByPoint(const Point& p, Ship& Result) const
+    bool FindShipByPoint(const Point& p, Ship* &Result) const
     {
-        for (Ship ship: _ships)
+        for (const Ship &ship: _ships)
         {
-            for (Point _p : ship.getPoints())
+            for (const Point &_p : ship.getPoints())
 
                 if (p == _p)
-                {
-                   Result = ship;
-                   return true;
+                {                  
+                   Result = const_cast<Ship*>(&ship);
+				   return true;
                 }
         }
 
@@ -185,8 +201,6 @@ public:
     {
         return _ships.count();
     }
-
-
 
     void scanShips()
     {
@@ -311,17 +325,30 @@ class SeaGame: public QObject
 
         ~SeaGame()
     {
-       //clear all ships
-       for (int Row = 0; Row < _i; ++Row)
-       {
+		
+		for (Ship& ship : ComputerField->getShip())
+		{
+			ship.clear();
+		}
+		
+		for (Ship& ship : PlayerField->getShip())
+		{
+			ship.clear();
+		}
+
+		/*
+		//clear all ships		
+		for (int Row = 0; Row < _i; ++Row)
+		{
         for (int Col = 0; Col < _j; ++Col)
-            {
+           {
                 uint index = Row * GetRowCount() + Col;
                 ComputerField->setPoint(index, false);
-                PlayerField->setPoint(index, false);
+				PlayerField->setPoint(index, false);
             }
         }
-       GameStarted = false;
+         */
+	   GameStarted = false;
    }
 
         const SeaField* GetComputerField() const { return ComputerField; }
@@ -330,7 +357,9 @@ class SeaGame: public QObject
         int GetRowCount() const { return _i;}
         int GetColumnCount() const { return _j;}
 
+		void SetPlayerShip();
         bool PlayerIsReady() const;
+
 
         void GameLoop();
         bool EndOfGame() const;
@@ -340,7 +369,7 @@ class SeaGame: public QObject
 
     protected:       
         void initializeFields();
-        void SetShip(const int lenght);
+        void SetShip(const int lenght, SeaField* To);
 
     private:
         const int _i,_j;           //размерность горизонтали и вертикали

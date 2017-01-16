@@ -7,15 +7,6 @@ MainWindow::MainWindow(QWidget *parent) :
     game(nullptr)
 {
     ui->setupUi(this);
-
-    /*signalMapper = new QSignalMapper(this);
-
-    connect(ui->tableWidgetLeft, SIGNAL(cellClicked(int,int)), signalMapper, SLOT(map(int,int)));
-    signalMapper->setMapping(ui->tableWidgetLeft,"tableWidgetLeft");
-
-    connect(ui->tableWidgetRight, SIGNAL(cellClicked(int,int)), signalMapper, SLOT(map(int,int)));
-    signalMapper->setMapping(ui->tableWidgetRight,"tableWidgetRight");
-    */
     repaint();
 }
 
@@ -24,6 +15,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+//top menu
 void MainWindow::on_actionCancel_triggered()
 {
     close();
@@ -39,7 +31,7 @@ void MainWindow::on_actionNew_game_triggered()
 
     if (ret == QMessageBox::No) return;
 
-    game->~SeaGame();
+	game->~SeaGame();
     repaint();
     return;
 
@@ -101,10 +93,10 @@ void MainWindow::repaint()
             QColor itemColor = PlayerPoint.fill ? black:white;
             ui->tableWidgetRight->item(row,col)->setBackgroundColor(itemColor);
 
-            Ship FindPlayerShip;
-            if (game->GetPlayerField()->FindShipByPoint(PlayerPoint,FindPlayerShip))
+            Ship* FindPlayerShip;
+            if (game->GetPlayerField()->FindShipByPoint(PlayerPoint, FindPlayerShip))
             {
-                if (FindPlayerShip.getDeckByPoint(PlayerPoint).fill)
+                if (FindPlayerShip->getDeckByPoint(PlayerPoint).fill == 1)
                     ui->tableWidgetRight->item(row,col)->setBackgroundColor(red);
 
             }
@@ -114,11 +106,11 @@ void MainWindow::repaint()
             QColor itemColor2 = ComputerPoint.fill ? black:white;
             ui->tableWidgetLeft->item(row,col)->setBackgroundColor(itemColor2);
 
-            Ship FindComputerShip;
+            Ship* FindComputerShip;
             if (game->GetComputerField()->FindShipByPoint(ComputerPoint,FindComputerShip))
-            {
-                if (FindComputerShip.getDeckByPoint(ComputerPoint).fill)
-                    ui->tableWidgetRight->item(row,col)->setBackgroundColor(red);
+            {            				
+				if (FindComputerShip->getDeckByPoint(ComputerPoint).fill == 1)
+                    ui->tableWidgetLeft->item(row,col)->setBackgroundColor(red);
 
             }
         }
@@ -149,6 +141,7 @@ void MainWindow::repaint()
         ui->statusbar->showMessage("click start game");
 }
 
+//tablewidgets
 void MainWindow::on_tableWidgetLeft_cellClicked(int row, int column)
 {
 
@@ -160,8 +153,25 @@ void MainWindow::on_tableWidgetRight_cellClicked(int row, int column)
    repaint();
 }
 
+//bottom buttons
 void MainWindow::on_pushButton_clicked()
 {
     SeaField* test =  const_cast<SeaField*>(game->GetComputerField());
     test->scanShips();
+}
+
+void MainWindow::on_pushButtonRight_clicked()
+{
+	if (game == nullptr)
+	{
+		return;
+	}
+	else
+	{
+		if (game->GetPlayerField()->getShipCount() == 0)
+		{
+			game->SetPlayerShip();
+			repaint();
+		}		
+	}
 }
