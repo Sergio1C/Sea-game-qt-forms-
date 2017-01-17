@@ -37,7 +37,8 @@ public:
 
         }    
 
-        activeNumberOfShip = 0;
+		_ships = new QMultiMap<int, Ship>;
+
     }
 
     Point operator[](const int _i) const
@@ -162,27 +163,23 @@ public:
 	{
 		if (lenghtOfShip == 0)
 		{
-			QList<Ship> &ref = _ships.values();
-			return ref;
+			return _ships->values();
 		}
-		QList<Ship> & ref = _ships.values(lenghtOfShip);
-		return ref;
+		return _ships->values(lenghtOfShip);
 	}
 
-	QList<Ship>& getShip(const int lenghtOfShip = 0)
+	QMultiMap<int,Ship>* getShips(const int lenghtOfShip = 0)
 	{
 		if (lenghtOfShip == 0)
 		{
-			QList<Ship> &ref = _ships.values();
-			return ref;
+			return _ships;
 		}		 
-			QList<Ship> & ref = _ships.values(lenghtOfShip);
-			return ref;
+			return _ships;
 	}
 
     bool FindShipByPoint(const Point& p, Ship* &Result) const
     {
-        for (const Ship &ship: _ships)
+        for (const Ship &ship: *_ships)
         {
             for (const Point &_p : ship.getPoints())
 
@@ -199,13 +196,12 @@ public:
 
     uint getShipCount() const
     {
-        return _ships.count();
+        return _ships->count();
     }
 
     void scanShips()
     {
-       _ships.clear();
-       activeNumberOfShip = 0;
+       _ships->clear();
 
        Point FirstPoint;
        int filled = 0;
@@ -216,7 +212,7 @@ public:
 
            if (filled)
            {
-               _ships.insert(filled,Ship(FirstPoint,true,filled));
+               _ships->insert(filled,Ship(FirstPoint,true,filled));
                filled = 0;
            }
 
@@ -230,7 +226,7 @@ public:
                {
                    if (filled)
                    {
-                         _ships.insert(filled,Ship(FirstPoint,true,filled));
+                         _ships->insert(filled,Ship(FirstPoint,true,filled));
                    }
                    filled = 0;
                    continue;
@@ -249,7 +245,7 @@ public:
        //не забудем последний по горизонтали
        if (filled)
        {
-           _ships.insert(filled,Ship(FirstPoint,true,filled));
+           _ships->insert(filled,Ship(FirstPoint,true,filled));
            filled = 0;
        }
 
@@ -259,7 +255,7 @@ public:
 
            if (filled)
            {
-               _ships.insert(filled,Ship(FirstPoint,false,filled));
+               _ships->insert(filled,Ship(FirstPoint,false,filled));
                filled = 0;
            }
 
@@ -275,7 +271,7 @@ public:
                {
                    if (filled)
                    {
-                        _ships.insert(filled,Ship(FirstPoint,true,filled));
+                        _ships->insert(filled,Ship(FirstPoint,true,filled));
                    }
                    filled = 0;
                    continue;
@@ -294,7 +290,7 @@ public:
        //не забудем последний по вертикали
        if (filled)
        {
-           _ships.insert(filled,Ship(FirstPoint,false,filled));
+           _ships->insert(filled,Ship(FirstPoint,false,filled));
            filled = 0;
        }
 
@@ -308,7 +304,7 @@ protected:
      int activeNumberOfShip; // номер текущего корабля. Используется при начальной нумерации кораблей
 
 private:
-     QMultiMap<int,Ship> _ships; //массив кораблей на поле
+     QMultiMap<int,Ship>* _ships; //массив кораблей на поле
 
 
 };
@@ -323,33 +319,7 @@ class SeaGame: public QObject
         initializeFields();
     }
 
-        ~SeaGame()
-    {
-		
-		for (Ship& ship : ComputerField->getShip())
-		{
-			ship.clear();
-		}
-		
-		for (Ship& ship : PlayerField->getShip())
-		{
-			ship.clear();
-		}
-
-		/*
-		//clear all ships		
-		for (int Row = 0; Row < _i; ++Row)
-		{
-        for (int Col = 0; Col < _j; ++Col)
-           {
-                uint index = Row * GetRowCount() + Col;
-                ComputerField->setPoint(index, false);
-				PlayerField->setPoint(index, false);
-            }
-        }
-         */
-	   GameStarted = false;
-   }
+		~SeaGame();
 
         const SeaField* GetComputerField() const { return ComputerField; }
         const SeaField* GetPlayerField()   const { return PlayerField; }
