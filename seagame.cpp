@@ -2,6 +2,13 @@
 #include <QTime>
 #include <QTableWidget>
 
+   SeaGame::~SeaGame()
+{
+	ComputerField->getShips()->clear();
+	PlayerField->getShips()->clear();
+	GameStarted = false;
+}
+
 void SeaGame::initializeFields()
 {
     //создадим пустые поля
