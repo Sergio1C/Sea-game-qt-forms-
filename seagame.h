@@ -163,9 +163,9 @@ public:
 	{
 		if (lenghtOfShip == 0)
 		{
-			return _ships->values();
+            return _ships->values();
 		}
-		return _ships->values(lenghtOfShip);
+        return _ships->values(lenghtOfShip);
 	}
 
 	QMultiMap<int,Ship>* getShips(const int lenghtOfShip = 0)
