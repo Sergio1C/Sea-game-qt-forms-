@@ -26,15 +26,16 @@ public:
     SeaField(int _i, int _j):i(_i),j(_j)
     {
         QVector<Point> tmp;
-        for (int Row = 0; Row < i; ++Row)
+		_Field = new Field;
+		
+		for (int Row = 0; Row < i; ++Row)
         {
             for (int Col = 0; Col < j; ++Col)
             {
                 tmp.push_back(Point(Row,Col));
             }
-            _Field.push_back(tmp);
+            _Field->push_back(tmp);
             tmp.clear();
-
         }    
 
 		_ships = new QMultiMap<int, Ship>;
@@ -45,12 +46,12 @@ public:
     {
         int Row = _i / i;
         int Col = _i % j;
-        Point tmp = _Field.at(Row).at(Col);
+        Point tmp = _Field->at(Row).at(Col);
         return tmp;
     }
     Point operator[](const Point& p) const
     {
-        Point tmp = _Field.at(p.x).at(p.y);
+        Point tmp = _Field->at(p.x).at(p.y);
         return tmp;
     }
 
@@ -58,7 +59,8 @@ public:
 
     void setPoint(const Point& p)
     {
-        _Field[p.x][p.y] = p;
+        //_Field[p.x][p.y] = p;
+		_Field->operator[](p.x).operator[](p.y) = p;
     }
     //index = row * GetRowCount() + column
     void setPoint(const int index, bool fill = true)
@@ -107,16 +109,16 @@ public:
 
     const Point& getPoint(int row, int col) const
     {
-        return _Field.at(row).at(col);
+		return _Field->at(row).at(col);
     }
 
     int getPointCount(bool isFill = true) const
     {
         int _count = 0;
 
-        for (QVector<Point> row: _Field)
+        for (QVector<Point> &row: *_Field)
         {
-            for(Point p: row)
+            for(Point &p: row)
             {
                 if (p.fill && isFill)
                     ++_count;
@@ -128,7 +130,7 @@ public:
 
     //управление кораблями
 
-    bool CheckShip(const Ship someShip) const
+    bool CheckShip(const Ship& someShip) const
     {
         //1.проверка выхода корабля за пределы поля игры
         int maxRowPosition = (i-someShip.getLenght());
@@ -139,7 +141,7 @@ public:
         if (someShip.getFirstPoint().y > maxColPosition) return false;
 
         //2.проверка на пересчение с другими кораблями. Между кораблями должна быть одна точка
-        foreach (Point p, someShip.getPoints())
+        for (const Point& p : someShip.getPoints())
         {
             if (this->operator[](p).fill) return false;
             if (!checkPoint(p)) return false;
@@ -148,7 +150,7 @@ public:
         return true;
     }
 
-    void SetShip(const Ship someShip)
+    void SetShip(const Ship& someShip)
     {
         for(Point p : someShip.getPoints())
         {
@@ -218,7 +220,7 @@ public:
 
            for (int y = 0; y < j; ++y)
            {
-               Point p = _Field.at(x).at(y);
+               Point p = _Field->at(x).at(y);
 
                if (!p.fill && filled == 0 ) continue;
 
@@ -261,7 +263,7 @@ public:
 
            for (int y = 0; y < j; ++y)
            {
-               Point p = _Field.at(y).at(x);
+               Point p = _Field->at(y).at(x);
 
                if (!p.fill && filled == 0 ) continue;
                //пропускаем однопалубные корабли, они были добавлены при первом проходе выше
@@ -298,7 +300,7 @@ public:
 
     int i;          //кол-во строк
     int j;          //кол-во столбцов
-    Field _Field;   //игровое поле
+    Field* _Field;  //игровое поле
 
 protected:
      int activeNumberOfShip; // номер текущего корабля. Используется при начальной нумерации кораблей
@@ -318,7 +320,6 @@ class SeaGame: public QObject
     {
         initializeFields();
     }
-
 		~SeaGame();
 
         const SeaField* GetComputerField() const { return ComputerField; }
@@ -330,16 +331,16 @@ class SeaGame: public QObject
 		void SetPlayerShip();
         bool PlayerIsReady() const;
 
-
+	
         void GameLoop();
         bool EndOfGame() const;
 
         void PlayerShoot(const Point&);
         void ComputerShoot(const Point&);
-
-    protected:       
+       
         void initializeFields();
-        void SetShip(const int lenght, SeaField* To);
+		void clearFields();
+		void SetShip(const int lenght, SeaField* To);
 
     private:
         const int _i,_j;           //размерность горизонтали и вертикали

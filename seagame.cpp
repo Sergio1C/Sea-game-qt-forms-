@@ -4,9 +4,8 @@
 
    SeaGame::~SeaGame()
 {
-	ComputerField->getShips()->clear();
-	PlayerField->getShips()->clear();
-	GameStarted = false;
+	delete[] PlayerField;
+	delete[] ComputerField;
 }
 
 void SeaGame::initializeFields()
@@ -36,6 +35,12 @@ void SeaGame::initializeFields()
 	SetShip(1, ComputerField);
 	SetShip(1, ComputerField);
 	SetShip(1, ComputerField);
+}
+
+void SeaGame::clearFields()
+{
+	ComputerField->getShips()->clear();
+	PlayerField->getShips()->clear();
 }
 
 void SeaGame::SetShip(const int lenght, SeaField* To)
@@ -78,18 +83,12 @@ void SeaGame::SetPlayerShip()
 
 bool SeaGame::PlayerIsReady() const
 {
-    //предполагаем, что компьютер уже расставил свои корабли, в таком случае, количество заполненных
-    //точек на полях должно быть одинаково, просто проверим это.
-    int ComputerPointCount = ComputerField->getPointCount();
-    int PlayerPointCount   = PlayerField->getPointCount();
-
-    if (ComputerPointCount != PlayerPointCount) return false;
-
+    //предполагаем, что компьютер уже расставил свои корабли, в таком случае, количество кораблей
+    //должно быть одинаково, просто проверим это.
     int PlayerShipCount   = PlayerField->getShipCount();
     int ComputerShipCount = ComputerField->getShipCount();
 
     return (PlayerShipCount == ComputerShipCount);
-
 }
 
 //слоты поля игрока

@@ -4,7 +4,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    game(nullptr)
+    game(new SeaGame())
 {
     ui->setupUi(this);
     repaint();
@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+	delete game;
 }
 
 //top menu
@@ -31,14 +32,15 @@ void MainWindow::on_actionNew_game_triggered()
 
     if (ret == QMessageBox::No) return;
 
-	game->~SeaGame();
-    repaint();
+	game->clearFields();
+	GameStarted = false;
+	repaint();
     return;
 
     }
 
-    //player is ready.game started
-    if (game != 0 && game->PlayerIsReady() && !GameStarted)
+    //player is arranging ships...game started
+    if (game->PlayerIsReady() && !GameStarted)
     {
         GameStarted = true;
         //GameLoop();
@@ -47,19 +49,15 @@ void MainWindow::on_actionNew_game_triggered()
 
     PrepareForm();
 
-    game = new SeaGame();
-
     //right field
-    //connect(signalMapper, SIGNAL(mapped(const QString&)), game, SLOT(PlayerClick(const QString&));
     QObject::connect(ui->tableWidgetRight,SIGNAL(cellClicked(int,int)),game,SLOT(PlayerClick(int,int)));
     QObject::connect(ui->tableWidgetRight,SIGNAL(cellDoubleClicked(int,int)),game,SLOT(PlayerDoubleClick(int,int)));
-    //left field
+   
+	//left field
     QObject::connect(ui->tableWidgetLeft, SIGNAL(cellClicked(int,int)), game, SLOT(PlayerClick(int,int)));
 
     QObject::connect(game, SIGNAL(RepaintForm()), this, SLOT(repaint()));
-    game->RepaintForm();
-
-
+	repaint();
 }
 
 void MainWindow::PrepareForm()
@@ -74,8 +72,8 @@ void MainWindow::PrepareForm()
 
 void MainWindow::repaint()
 {
-   if (game == nullptr)
-    {   ui->statusbar->showMessage("click new game");
+   if (!GameStarted)
+    {   ui->statusbar->showMessage("Arrange your ships");
         return;
     }
 
@@ -88,32 +86,36 @@ void MainWindow::repaint()
     for (int row = 0; row < game->GetRowCount(); row++)
         for (int col = 0; col < game->GetColumnCount(); col++)
         {
-            //fill players ships
-            Point PlayerPoint = game->GetPlayerField()->getPoint(row, col);
-            QColor itemColor = PlayerPoint.fill ? black:white;
-            ui->tableWidgetRight->item(row,col)->setBackgroundColor(itemColor);
-
-            Ship* FindPlayerShip;
-            if (game->GetPlayerField()->FindShipByPoint(PlayerPoint, FindPlayerShip))
-            {
-                if (FindPlayerShip->getDeckByPoint(PlayerPoint).fill == 1)
-                    ui->tableWidgetRight->item(row,col)->setBackgroundColor(red);
-
-            }
+            //show players ships
+			QColor itemColor = white;
+			const Point& PlayerPoint = game->GetPlayerField()->getPoint(row, col);
+			
+			Ship* FindPlayerShip;;
+			if (game->GetPlayerField()->FindShipByPoint(PlayerPoint, FindPlayerShip))
+			{
+				if (FindPlayerShip->getDeckByPoint(PlayerPoint).fill == 1)
+					itemColor = red;
+				else
+					itemColor = black;
+			}
+			
+			ui->tableWidgetRight->item(row, col)->setBackgroundColor(itemColor);
 
             //fill computer ships
-            Point ComputerPoint = game->GetComputerField()->getPoint(row, col);
-            QColor itemColor2 = ComputerPoint.fill ? black:white;
-            ui->tableWidgetLeft->item(row,col)->setBackgroundColor(itemColor2);
+			itemColor = white;			
+			const Point& ComputerPoint = game->GetComputerField()->getPoint(row, col);
 
             Ship* FindComputerShip;
             if (game->GetComputerField()->FindShipByPoint(ComputerPoint,FindComputerShip))
             {            				
 				if (FindComputerShip->getDeckByPoint(ComputerPoint).fill == 1)
-                    ui->tableWidgetLeft->item(row,col)->setBackgroundColor(red);
-
+					itemColor = red;
+				else
+					itemColor = black;
             }
-        }
+        
+			ui->tableWidgetLeft->item(row, col)->setBackgroundColor(itemColor);
+		}
 
         QString textButton = (game->PlayerIsReady() && !GameStarted)? "Start" : "New game";
         ui->menuNewGame->actions().at(0)->setText(textButton);
