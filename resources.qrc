@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/images">
+        <file alias = "cross.jpg">images/cross.jpg</file>
+        <file alias = "past.jpg">images/past.jpg</file>
+    </qresource>
+</RCC>
