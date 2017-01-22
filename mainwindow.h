@@ -29,13 +29,11 @@ private slots:
 
     void on_actionNew_game_triggered();
 
-    void on_tableWidgetLeft_cellClicked(int row, int column);
-
-    void on_tableWidgetRight_cellClicked(int row, int column);
-
     void on_pushButton_clicked();
 
     void on_pushButtonRight_clicked();
+
+    void on_action_Start_game_triggered();
 
 public slots:
     void repaint();

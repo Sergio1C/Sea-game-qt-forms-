@@ -60,7 +60,7 @@
      <number>10</number>
     </property>
     <attribute name="horizontalHeaderVisible">
-     <bool>true</bool>
+     <bool>false</bool>
     </attribute>
     <attribute name="horizontalHeaderCascadingSectionResizes">
      <bool>false</bool>
@@ -182,7 +182,7 @@
      <number>10</number>
     </property>
     <attribute name="horizontalHeaderVisible">
-     <bool>true</bool>
+     <bool>false</bool>
     </attribute>
     <attribute name="horizontalHeaderCascadingSectionResizes">
      <bool>false</bool>
@@ -197,7 +197,7 @@
      <number>20</number>
     </attribute>
     <attribute name="verticalHeaderVisible">
-     <bool>true</bool>
+     <bool>false</bool>
     </attribute>
     <attribute name="verticalHeaderDefaultSectionSize">
      <number>20</number>
@@ -313,18 +313,25 @@
      <string>Menu</string>
     </property>
     <addaction name="actionNew_game"/>
+    <addaction name="action_Start_game"/>
+    <addaction name="separator"/>
     <addaction name="actionCancel"/>
    </widget>
    <addaction name="menuNewGame"/>
   </widget>
   <action name="actionNew_game">
    <property name="text">
-    <string>New game</string>
+    <string>1. New game</string>
    </property>
   </action>
   <action name="actionCancel">
    <property name="text">
     <string>Cancel</string>
+   </property>
+  </action>
+  <action name="action_Start_game">
+   <property name="text">
+    <string>2. Start game</string>
    </property>
   </action>
  </widget>

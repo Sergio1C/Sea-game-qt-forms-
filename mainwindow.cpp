@@ -7,6 +7,16 @@ MainWindow::MainWindow(QWidget *parent) :
     game(new SeaGame())
 {
     ui->setupUi(this);
+
+    //right field
+    QObject::connect(ui->tableWidgetRight,SIGNAL(cellClicked(int,int)),game,SLOT(PlayerClick(int,int)));
+    QObject::connect(ui->tableWidgetRight,SIGNAL(cellDoubleClicked(int,int)),game,SLOT(PlayerDoubleClick(int,int)));
+    //left field
+    QObject::connect(ui->tableWidgetLeft, SIGNAL(cellClicked(int,int)), game, SLOT(PlayerClick(int,int)));
+    //refresh form
+    QObject::connect(game, SIGNAL(RepaintForm()), this, SLOT(repaint()));
+
+    PrepareForm();
     repaint();
 }
 
@@ -26,38 +36,26 @@ void MainWindow::on_actionNew_game_triggered()
 {
     if (GameStarted)
     {
-    QMessageBox::StandardButton ret = QMessageBox::question(this,"",
-                                     "The Sea Game is now play.Close it and play again?",
-                                     QMessageBox::Yes | QMessageBox::No);
+        QMessageBox::StandardButton ret = QMessageBox::question(this,"",
+                                         "The Sea Game is now play.Close it and play again?",
+                                         QMessageBox::Yes | QMessageBox::No);
 
-    if (ret == QMessageBox::No) return;
+        if (ret == QMessageBox::No) return;
 
-	game->clearFields();
-	GameStarted = false;
-	repaint();
-    return;
-
-    }
-
-    //player is arranging ships...game started
-    if (game->PlayerIsReady() && !GameStarted)
-    {
-        GameStarted = true;
-        //GameLoop();
+        game->clearFields();
+        GameStarted = false;
+        repaint();
         return;
     }
 
-    PrepareForm();
+    game->initializeFields();
+    GameStarted = true;
+    repaint();
+}
 
-    //right field
-    QObject::connect(ui->tableWidgetRight,SIGNAL(cellClicked(int,int)),game,SLOT(PlayerClick(int,int)));
-    QObject::connect(ui->tableWidgetRight,SIGNAL(cellDoubleClicked(int,int)),game,SLOT(PlayerDoubleClick(int,int)));
-   
-	//left field
-    QObject::connect(ui->tableWidgetLeft, SIGNAL(cellClicked(int,int)), game, SLOT(PlayerClick(int,int)));
-
-    QObject::connect(game, SIGNAL(RepaintForm()), this, SLOT(repaint()));
-	repaint();
+void MainWindow::on_action_Start_game_triggered()
+{
+    //game->GameLoop();
 }
 
 void MainWindow::PrepareForm()
@@ -68,57 +66,68 @@ void MainWindow::PrepareForm()
             ui->tableWidgetLeft->setItem(row,col,new QTableWidgetItem(0));
             ui->tableWidgetRight->setItem(row,col, new QTableWidgetItem(0));
         }
+
+    ui->tableWidgetLeft->verticalHeader()->setVisible(true);
+    ui->tableWidgetLeft->horizontalHeader()->setVisible(true);
+    ui->tableWidgetRight->verticalHeader()->setVisible(true);
+    ui->tableWidgetRight->horizontalHeader()->setVisible(true);
 }
 
 void MainWindow::repaint()
 {
-   if (!GameStarted)
-    {   ui->statusbar->showMessage("Arrange your ships");
-        return;
-    }
-
-   ui->tableWidgetRight->setEnabled(!GameStarted);
+   ui->statusbar->showMessage(!GameStarted ? "Click 'New Game'" : "");
+   ui->menuNewGame->actions().at(1)->setEnabled(GameStarted && game->PlayerIsReady());
+   ui->tableWidgetRight->setEnabled(GameStarted);
 
    QColor black = QColor(Qt::black);
    QColor white = QColor(Qt::white);
    QColor red   = QColor(Qt::red);
+   QColor blue = QColor(Qt::blue);
 
     for (int row = 0; row < game->GetRowCount(); row++)
         for (int col = 0; col < game->GetColumnCount(); col++)
         {
+            const Point& p = game->GetPlayerField()->getPoint(row, col);
+
+            //show computer ships
+            QColor itemColor = white;
+
+            for (Point& Shots : game->GetComputerField()->getShots())
+            {
+              if (p == Shots) { itemColor = blue;}
+            }
+
+            Ship* FindComputerShip;
+            if (game->GetComputerField()->FindShipByPoint(p,FindComputerShip))
+            {
+                if (FindComputerShip->getDeckByPoint(p).fill == 1)
+                    itemColor = red;
+                else
+                    itemColor = black;
+            }
+
+            ui->tableWidgetLeft->item(row, col)->setBackgroundColor(itemColor);
+
             //show players ships
-			QColor itemColor = white;
-			const Point& PlayerPoint = game->GetPlayerField()->getPoint(row, col);
+            itemColor = white;
 			
-			Ship* FindPlayerShip;;
-			if (game->GetPlayerField()->FindShipByPoint(PlayerPoint, FindPlayerShip))
+            for (Point& Shots : game->GetPlayerField()->getShots())
+            {
+              if (p == Shots) { itemColor = blue;}
+            }
+
+            Ship* FindPlayerShip;
+            if (game->GetPlayerField()->FindShipByPoint(p, FindPlayerShip))
 			{
-				if (FindPlayerShip->getDeckByPoint(PlayerPoint).fill == 1)
+                if (FindPlayerShip->getDeckByPoint(p).fill == 1)
 					itemColor = red;
 				else
 					itemColor = black;
 			}
-			
+
 			ui->tableWidgetRight->item(row, col)->setBackgroundColor(itemColor);
 
-            //fill computer ships
-			itemColor = white;			
-			const Point& ComputerPoint = game->GetComputerField()->getPoint(row, col);
-
-            Ship* FindComputerShip;
-            if (game->GetComputerField()->FindShipByPoint(ComputerPoint,FindComputerShip))
-            {            				
-				if (FindComputerShip->getDeckByPoint(ComputerPoint).fill == 1)
-					itemColor = red;
-				else
-					itemColor = black;
-            }
-        
-			ui->tableWidgetLeft->item(row, col)->setBackgroundColor(itemColor);
 		}
-
-        QString textButton = (game->PlayerIsReady() && !GameStarted)? "Start" : "New game";
-        ui->menuNewGame->actions().at(0)->setText(textButton);
 
         //Status bar:
         QString textStatusBar = "Arrange your ships: ";
@@ -143,18 +152,6 @@ void MainWindow::repaint()
         ui->statusbar->showMessage("click start game");
 }
 
-//tablewidgets
-void MainWindow::on_tableWidgetLeft_cellClicked(int row, int column)
-{
-
-    repaint();
-}
-
-void MainWindow::on_tableWidgetRight_cellClicked(int row, int column)
-{
-   repaint();
-}
-
 //bottom buttons
 void MainWindow::on_pushButton_clicked()
 {
@@ -177,3 +174,5 @@ void MainWindow::on_pushButtonRight_clicked()
 		}		
 	}
 }
+
+

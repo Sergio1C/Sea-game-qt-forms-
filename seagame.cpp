@@ -10,13 +10,11 @@
 
 void SeaGame::initializeFields()
 {
-    //создадим пустые поля
-    PlayerField = new SeaField(_i,_j);
-    ComputerField = new SeaField(_i,_j);
-
     //расстановим корабли компьютера
     int seed = QTime::currentTime().msecsSinceStartOfDay();
     qsrand(seed);
+
+    clearFields();
 
     //4-палубные
     SetShip(4, ComputerField);
@@ -35,20 +33,23 @@ void SeaGame::initializeFields()
 	SetShip(1, ComputerField);
 	SetShip(1, ComputerField);
 	SetShip(1, ComputerField);
+
+    ComputerField->scanShips();
+
 }
 
 void SeaGame::clearFields()
 {
-	ComputerField->getShips()->clear();
-	PlayerField->getShips()->clear();
+    ComputerField->clear();
+    PlayerField->clear();
 }
 
 void SeaGame::SetShip(const int lenght, SeaField* To)
 {
     while (true)
     {
-        int RandomNumber = qrand() % 2;
-        bool horizont = (RandomNumber) == 1 ? true : false;
+        int rand0_or_1 = qrand() % 2;
+        bool horizont = (rand0_or_1) == 1 ? true : false;
         int pos = qrand() % (_i*_j);
 
         Point FirstPoint(pos);
@@ -108,9 +109,22 @@ void SeaGame::PlayerClick(int row, int column)
 
     //клик по полю компьютера
     if (senderName == "tableWidgetLeft")
-    {
+    {               
+
         Point p(PlayerField->operator []( row * GetRowCount() + column));
-        PlayerShoot(p);
+
+
+
+        if (PlayerShoot(p))
+        {
+
+        }
+        else
+        {
+            ComputerShoot();
+        }
+
+
     }
 
     RepaintForm();
@@ -127,14 +141,46 @@ void SeaGame::GameLoop()
 
 }
 
-void SeaGame::PlayerShoot(const Point& In)
+bool SeaGame::PlayerShoot(const Point& In)
 {
-    Ship* FindShip;
+     if (ComputerField->isNewShots(In))
+     {
+        Ship* FindShip;
+        if  (!ComputerField->FindShipByPoint(In,FindShip))
+           {
+             return false;
+           }
 
-    if (!ComputerField->FindShipByPoint(In,FindShip))
+        //пробиваем палубу
+        FindShip->setDeckByPoint(In, true);
+        return true;
+
+     }
+     return true;
+}
+
+void SeaGame::ComputerShoot()
+{
+   while (true)
+   {
+    int pos = qrand() % (_i*_j);
+    Point In(pos);
+
+    if (!PlayerField->isNewShots(In)) continue;
+
+    Ship* Findship;
+    if (!PlayerField->FindShipByPoint(In, Findship))
+    {
         return;
-	//пробиваем палубу
-	FindShip->setDeckByPoint(In, true);				
+    }
+
+   Point& Deck = Findship->getDeckByPoint(In);
+
+   if (Deck.fill == true) continue;
+
+   Deck.fill = true;
+   }
+
 }
 
 bool SeaGame::EndOfGame() const
