@@ -17,7 +17,7 @@ Ship::Ship(const Point& First, bool horizont, const int lenght)
       else
       {
           _points.push_back(Point(First.x, First.y + i, true));
-           _decks.push_back(Point(First.x + i, First.y, false));
+           _decks.push_back(Point(First.x, First.y + i, false));
       }
     }
 }
@@ -68,7 +68,7 @@ void Ship::setDeckByPoint(const Point& p, bool fill = true)
 		FindPoint->fill = fill;
 }
 
-Ship Ship::operator=(Ship& SomeShip)
+Ship Ship::operator=(const Ship& SomeShip)
 {
 
     if (*this != const_cast<const Ship&>(SomeShip))

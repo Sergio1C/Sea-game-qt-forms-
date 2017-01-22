@@ -15,7 +15,7 @@ public:
     bool operator==(const Ship&);
     bool operator!=(const Ship&);
 
-    Ship operator=(Ship&);
+    Ship operator=(const Ship&);
 
     bool horizont() const
     {

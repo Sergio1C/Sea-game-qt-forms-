@@ -15,16 +15,21 @@ TEMPLATE = app
 SOURCES += main.cpp \
     seagame.cpp \
     ships.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    seafield.cpp
 
 HEADERS  += \
     seagame.h \
     ships.h \
     points.h \
-    mainwindow.h
+    mainwindow.h \
+    seafield.h
 
 FORMS += \
     mainwindow.ui
 
 DISTFILES += \
     README.md
+
+RESOURCES += \
+    resources.qrc
