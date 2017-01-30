@@ -10,7 +10,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //right field
     QObject::connect(ui->tableWidgetRight,SIGNAL(cellClicked(int,int)),game,SLOT(PlayerClick(int,int)));
-    QObject::connect(ui->tableWidgetRight,SIGNAL(cellDoubleClicked(int,int)),game,SLOT(PlayerDoubleClick(int,int)));
     //left field
     QObject::connect(ui->tableWidgetLeft, SIGNAL(cellClicked(int,int)), game, SLOT(PlayerClick(int,int)));
     //refresh form
@@ -34,7 +33,7 @@ void MainWindow::on_actionCancel_triggered()
 
 void MainWindow::on_actionNew_game_triggered()
 {
-    if (GameStarted)
+    if (game->GameInit)
     {
         QMessageBox::StandardButton ret = QMessageBox::question(this,"",
                                          "The Sea Game is now play.Close it and play again?",
@@ -43,19 +42,20 @@ void MainWindow::on_actionNew_game_triggered()
         if (ret == QMessageBox::No) return;
 
         game->clearFields();
-        GameStarted = false;
+        game->GameInit = false;
         repaint();
         return;
     }
 
     game->initializeFields();
-    GameStarted = true;
+    game->GameInit = true;
     repaint();
 }
 
 void MainWindow::on_action_Start_game_triggered()
 {
-    //game->GameLoop();
+    game->GameStarted = !game->GameStarted;
+    repaint();
 }
 
 void MainWindow::PrepareForm()
@@ -75,14 +75,19 @@ void MainWindow::PrepareForm()
 
 void MainWindow::repaint()
 {
-   ui->statusbar->showMessage(!GameStarted ? "Click 'New Game'" : "");
-   ui->menuNewGame->actions().at(1)->setEnabled(GameStarted && game->PlayerIsReady());
-   ui->tableWidgetRight->setEnabled(GameStarted);
+   ui->statusbar->showMessage(!game->GameInit ? "Click 'New Game'" : "");
+   ui->menuNewGame->actions().at(1)->setEnabled(game->GameInit && game->PlayerIsReady());
 
-   QColor black = QColor(Qt::black);
-   QColor white = QColor(Qt::white);
-   QColor red   = QColor(Qt::red);
-   QColor blue = QColor(Qt::blue);
+   ui->tableWidgetLeft->setEnabled(game->GameStarted);
+   ui->tableWidgetRight->setEnabled(game->GameInit);
+   ui->pushButtonRight->setEnabled(game->GameInit && !game->GameStarted);
+
+   QPixmap past  = QPixmap(":/images/past.jpg");
+   QPixmap cross = QPixmap(":/images/cross.jpg");
+   QPixmap empty = QPixmap(cross.width(),cross.height());
+   empty.fill();
+   QPixmap ship  = QPixmap(cross.width(),cross.height());
+   ship.fill(QColor("black"));
 
     for (int row = 0; row < game->GetRowCount(); row++)
         for (int col = 0; col < game->GetColumnCount(); col++)
@@ -90,43 +95,53 @@ void MainWindow::repaint()
             const Point& p = game->GetPlayerField()->getPoint(row, col);
 
             //show computer ships
-            QColor itemColor = white;
+            QPixmap itemColor = empty;
 
-            for (Point& Shots : game->GetComputerField()->getShots())
+            for (Point& p_shot : game->GetComputerField()->getShots())
             {
-              if (p == Shots) { itemColor = blue;}
+              if (p == p_shot) { itemColor = past;}
             }
 
             Ship* FindComputerShip;
             if (game->GetComputerField()->FindShipByPoint(p,FindComputerShip))
-            {
+            {               
                 if (FindComputerShip->getDeckByPoint(p).fill == 1)
-                    itemColor = red;
+                    itemColor = cross; //deck is broken
                 else
-                    itemColor = black;
+                   {
+                    if (game->EndOfGame())
+                        itemColor = ship;
+                   }
+
+                if (FindComputerShip->IsBroken())
+                {
+                    const QVector<Point> shipPoints = FindComputerShip->getPoints();
+
+                }
+
+
             }
 
-            ui->tableWidgetLeft->item(row, col)->setBackgroundColor(itemColor);
+           ui->tableWidgetLeft->item(row,col)->setIcon(QIcon(itemColor));
 
             //show players ships
-            itemColor = white;
+            itemColor = empty;
 			
             for (Point& Shots : game->GetPlayerField()->getShots())
             {
-              if (p == Shots) { itemColor = blue;}
+              if (p == Shots) { itemColor = past;}
             }
 
             Ship* FindPlayerShip;
             if (game->GetPlayerField()->FindShipByPoint(p, FindPlayerShip))
 			{
                 if (FindPlayerShip->getDeckByPoint(p).fill == 1)
-					itemColor = red;
+                    itemColor = cross;
 				else
-					itemColor = black;
+                    itemColor = ship;
 			}
 
-			ui->tableWidgetRight->item(row, col)->setBackgroundColor(itemColor);
-
+            ui->tableWidgetRight->item(row, col)->setIcon(itemColor);
 		}
 
         //Status bar:
@@ -152,27 +167,12 @@ void MainWindow::repaint()
         ui->statusbar->showMessage("click start game");
 }
 
-//bottom buttons
-void MainWindow::on_pushButton_clicked()
-{
-    SeaField* test =  const_cast<SeaField*>(game->GetComputerField());
-    test->scanShips();
-}
 
 void MainWindow::on_pushButtonRight_clicked()
 {
-	if (game == nullptr)
-	{
-		return;
-	}
-	else
-	{
-		if (game->GetPlayerField()->getShipCount() == 0)
-		{
-			game->SetPlayerShip();
-			repaint();
-		}		
-	}
+    const_cast<SeaField*>(game->GetPlayerField())->clear();
+    game->SetPlayerShip();
+    repaint();
 }
 
 

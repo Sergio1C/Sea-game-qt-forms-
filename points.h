@@ -1,5 +1,6 @@
 #ifndef POINTS_H
 #define POINTS_H
+#include <QVector>
 
 class Point
 {
@@ -32,6 +33,22 @@ public:
    friend bool operator!=(const Point& Left, const Point& Right)
    {
        return !(Left == Right);
+   }
+
+   friend QVector<Point>& getArroundPoints(const Point& p)
+   {
+        QVector<Point> ArroundPoints;
+
+        ArroundPoints.push_back(Point(p.x+1, p.y+1));
+        ArroundPoints.push_back(Point(p.x+1, p.y));
+        ArroundPoints.push_back(Point(p.x+1, p.y-1));
+        ArroundPoints.push_back(Point(p.x,  p.y+1));
+        ArroundPoints.push_back(Point(p.x  ,p.y-1));
+        ArroundPoints.push_back(Point(p.x-1,p.y+1));
+        ArroundPoints.push_back(Point(p.x-1, p.y));
+        ArroundPoints.push_back(Point(p.x-1, p.y-1));
+
+        return ArroundPoints;
    }
 
    int x;

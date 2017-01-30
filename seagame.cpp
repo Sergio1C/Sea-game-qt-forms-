@@ -2,7 +2,10 @@
 #include <QTime>
 #include <QTableWidget>
 
-   SeaGame::~SeaGame()
+bool SeaGame::GameInit = false;
+bool SeaGame::GameStarted = false;
+
+SeaGame::~SeaGame()
 {
 	delete[] PlayerField;
 	delete[] ComputerField;
@@ -92,15 +95,22 @@ bool SeaGame::PlayerIsReady() const
     return (PlayerShipCount == ComputerShipCount);
 }
 
-//слоты поля игрока
+//слот клика по полям
 void SeaGame::PlayerClick(int row, int column)
 {    
     QObject *obj = QObject::sender();
     QString senderName = qobject_cast<QTableWidget*>(obj)->objectName();
-
+    
+    if (!this->GameInit) return;
+    
     //клик по полю игрока
     if (senderName == "tableWidgetRight")
     {
+        if (GameStarted)
+        {
+            return;
+        }
+
         Point p(PlayerField->operator []( row * GetRowCount() + column));
         p.fill = !p.fill;
         PlayerField->setPoint(p);

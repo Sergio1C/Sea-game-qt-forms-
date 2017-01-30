@@ -13,8 +13,6 @@
 #define TWO_DECK_SHIP_COUNT     3
 #define ONE_DECK_SHIP_COUNT     4
 
-static bool GameStarted = false;
-
 class SeaGame: public QObject
 {
     Q_OBJECT
@@ -47,6 +45,9 @@ class SeaGame: public QObject
         void initializeFields();
 		void clearFields();
 		void SetShip(const int lenght, SeaField* To);
+
+        static bool GameInit;    //флаг - признак инициализации игры
+        static bool GameStarted; //флаг - признак старта игры
 
     private:
         const int _i,_j;           //размерность горизонтали и вертикали

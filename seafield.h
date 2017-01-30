@@ -46,6 +46,9 @@ public:
 
     uint getShipCount() const;
 
+    //возвращает близлижайщие точки около корабля по границе с ним
+    const QVector<Point>& getArroundPoint(const Ship& someShip) const;
+
     void scanShips();
 
     void clear();
@@ -56,11 +59,11 @@ public:
 
     const int i;          //кол-во строк
     const int j;          //кол-во столбцов
-    Field* _Field;  //игровое поле
+    Field* _Field;        //игровое поле
 
 private:
-     QMultiMap<int,Ship>* _ships; //массив кораблей на поле
-     QVector<Point>* _shots;           //массив обстреленных точек
+     QMultiMap<int,Ship>* _ships;           //массив кораблей на поле
+     QVector<Point>* _shots;                //массив обстреленных точек
 
 };
 

@@ -112,7 +112,7 @@ bool SeaField::CheckShip(const Ship& someShip) const
     else
     if (someShip.getFirstPoint().y > maxColPosition) return false;
 
-    //2.проверка на пересчение с другими кораблями. Между кораблями должна быть одна точка
+    //2.проверка на пересечение с другими кораблями. Между кораблями должна быть одна точка
     for (const Point& p : someShip.getPoints())
     {
         if (this->operator[](p).fill) return false;
@@ -171,6 +171,27 @@ bool SeaField::FindShipByPoint(const Point& p, Ship* &Result) const
 uint SeaField::getShipCount() const
 {
     return _ships->count();
+}
+
+const QVector<Point>& SeaField::getArroundPoint(const Ship& ship) const
+{
+
+    QVector<Point> ArroundPoints;
+
+    for (Point& p : ship)
+    {
+        for (Point& p2 : getArroundPoint(p))
+
+        {
+            if (!checkPoint(p2)) return;
+            ArroundPoints.push_back(p2);
+
+        }
+
+    }
+
+    return ArroundPoints;
+
 }
 
 void SeaField::scanShips()
