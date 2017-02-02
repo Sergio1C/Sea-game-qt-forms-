@@ -123,18 +123,15 @@ void SeaGame::PlayerClick(int row, int column)
 
         Point p(PlayerField->operator []( row * GetRowCount() + column));
 
-
-
         if (PlayerShoot(p))
-        {
-
-        }
+         {
+             PlayerField->scanShips();
+         }
         else
-        {
+         {
             ComputerShoot();
-        }
-
-
+            ComputerField->scanShips();
+         }
     }
 
     RepaintForm();
@@ -163,6 +160,7 @@ bool SeaGame::PlayerShoot(const Point& In)
 
         //пробиваем палубу
         FindShip->setDeckByPoint(In, true);
+
         return true;
 
      }

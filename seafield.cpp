@@ -173,21 +173,17 @@ uint SeaField::getShipCount() const
     return _ships->count();
 }
 
-const QVector<Point>& SeaField::getArroundPoint(const Ship& ship) const
+QVector<Point> SeaField::getArroundPoint(const Ship& ship) const
 {
 
     QVector<Point> ArroundPoints;
 
-    for (Point& p : ship)
+    for (const Point& p : ship.getPoints())
     {
-        for (Point& p2 : getArroundPoint(p))
-
+        for (const Point& p2 : p.getArroundPoints(i,j))
         {
-            if (!checkPoint(p2)) return;
             ArroundPoints.push_back(p2);
-
         }
-
     }
 
     return ArroundPoints;
@@ -287,6 +283,24 @@ void SeaField::scanShips()
    {
        _ships->insert(filled,Ship(FirstPoint,true,filled));
        filled = 0;
+   }
+
+   //проход по найденным кораблям
+   for (QMultiMap<int,Ship>::iterator it = _ships->begin(); it != _ships->end(); it++)
+   {
+       Ship ship = it.value();
+
+       if (!ship.IsBroken()) continue;
+
+       //если корабль потоплен, обстреляем соседние точки
+        for (Point& p : getArroundPoint(ship))
+           {
+               QVector<Point>::iterator FindPoint = std::find(_shots->begin(), _shots->end(), p);
+
+               if (FindPoint == _shots->end())
+                   _shots->push_back(p);
+
+           }
    }
 
 }

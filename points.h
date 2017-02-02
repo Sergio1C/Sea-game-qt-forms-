@@ -35,18 +35,42 @@ public:
        return !(Left == Right);
    }
 
-   friend QVector<Point>& getArroundPoints(const Point& p)
+   QVector<Point> getArroundPoints(int rows, int col) const
    {
         QVector<Point> ArroundPoints;
 
-        ArroundPoints.push_back(Point(p.x+1, p.y+1));
-        ArroundPoints.push_back(Point(p.x+1, p.y));
-        ArroundPoints.push_back(Point(p.x+1, p.y-1));
-        ArroundPoints.push_back(Point(p.x,  p.y+1));
-        ArroundPoints.push_back(Point(p.x  ,p.y-1));
-        ArroundPoints.push_back(Point(p.x-1,p.y+1));
-        ArroundPoints.push_back(Point(p.x-1, p.y));
-        ArroundPoints.push_back(Point(p.x-1, p.y-1));
+        if (x+1 < rows && y+1 < col)
+        {
+            ArroundPoints.push_back(Point(x+1, y+1));
+        }
+        if (x+1 < rows)
+        {
+            ArroundPoints.push_back(Point(x+1, y));
+        }
+        if (x+1 < rows && y-1 >= 0)
+        {
+            ArroundPoints.push_back(Point(x+1, y-1));
+        }
+        if (y-1 >= 0)
+        {
+            ArroundPoints.push_back(Point(x  ,y-1));
+        }
+        if (y+1 < col)
+        {
+            ArroundPoints.push_back(Point(x,  y+1));
+        }
+        if (x-1 >= 0 && y+1 < col)
+        {
+            ArroundPoints.push_back(Point(x-1,y+1));
+        }
+        if (x-1 >=0)
+        {
+            ArroundPoints.push_back(Point(x-1, y));
+        }
+        if (x-1 >=0 && y-1 >=0)
+        {
+            ArroundPoints.push_back(Point(x-1, y-1));
+        }
 
         return ArroundPoints;
    }
@@ -55,5 +79,6 @@ public:
    int y;
    bool fill;
 };
+
 
 #endif // POINTS_H

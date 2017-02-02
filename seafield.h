@@ -47,7 +47,7 @@ public:
     uint getShipCount() const;
 
     //возвращает близлижайщие точки около корабля по границе с ним
-    const QVector<Point>& getArroundPoint(const Ship& someShip) const;
+    QVector<Point> getArroundPoint(const Ship& someShip) const;
 
     void scanShips();
 

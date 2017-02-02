@@ -89,21 +89,24 @@ void MainWindow::repaint()
    QPixmap ship  = QPixmap(cross.width(),cross.height());
    ship.fill(QColor("black"));
 
+   const SeaField* ComputerField = game->GetComputerField();
+   const SeaField* PlayerField   = game->GetPlayerField();
+
     for (int row = 0; row < game->GetRowCount(); row++)
         for (int col = 0; col < game->GetColumnCount(); col++)
         {
-            const Point& p = game->GetPlayerField()->getPoint(row, col);
+            const Point& p = ComputerField->getPoint(row, col);
 
             //show computer ships
             QPixmap itemColor = empty;
 
-            for (Point& p_shot : game->GetComputerField()->getShots())
+            for (Point& p_shot : ComputerField->getShots())
             {
               if (p == p_shot) { itemColor = past;}
             }
 
             Ship* FindComputerShip;
-            if (game->GetComputerField()->FindShipByPoint(p,FindComputerShip))
+            if (ComputerField->FindShipByPoint(p,FindComputerShip))
             {               
                 if (FindComputerShip->getDeckByPoint(p).fill == 1)
                     itemColor = cross; //deck is broken
@@ -113,12 +116,16 @@ void MainWindow::repaint()
                         itemColor = ship;
                    }
 
+                /*
                 if (FindComputerShip->IsBroken())
                 {
-                    const QVector<Point> shipPoints = FindComputerShip->getPoints();
-
+                    for (const Point& ArroundPoint : ComputerField->getArroundPoint(*FindComputerShip))
+                    {
+                        ComputerField->operator []()
+                        ui->tableWidgetLeft->item(ArroundPoint.x,ArroundPoint.y)->setIcon(QIcon(past));
+                    }
                 }
-
+                */
 
             }
 
@@ -127,13 +134,13 @@ void MainWindow::repaint()
             //show players ships
             itemColor = empty;
 			
-            for (Point& Shots : game->GetPlayerField()->getShots())
+            for (Point& Shots : PlayerField->getShots())
             {
               if (p == Shots) { itemColor = past;}
             }
 
             Ship* FindPlayerShip;
-            if (game->GetPlayerField()->FindShipByPoint(p, FindPlayerShip))
+            if (PlayerField->FindShipByPoint(p, FindPlayerShip))
 			{
                 if (FindPlayerShip->getDeckByPoint(p).fill == 1)
                     itemColor = cross;

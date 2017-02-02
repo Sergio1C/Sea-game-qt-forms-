@@ -65,7 +65,7 @@ void Ship::setDeckByPoint(const Point& p, bool fill = true)
 	QVector<Point>::iterator FindPoint = std::find(_decks.begin(), _decks.end(), p);
 	
 	if (FindPoint != _decks.end())
-		FindPoint->fill = fill;
+		FindPoint->fill = fill;    
 }
 
 Ship Ship::operator=(const Ship& SomeShip)
