@@ -155,13 +155,14 @@ bool SeaField::FindShipByPoint(const Point& p, Ship* &Result) const
 {
     for (const Ship &ship: *_ships)
     {
-        for (const Point &_p : ship.getPoints())
+        QVector<Point> Points = ship.getPoints();
+        QVector<Point>::iterator FindPoint = std::find(Points.begin(), Points.end(), p);
 
-            if (p == _p)
-            {
-               Result = const_cast<Ship*>(&ship);
-               return true;
-            }
+        if (FindPoint != Points.end())
+        {
+            Result = const_cast<Ship*>(&ship);
+            return true;
+        }
     }
 
     return false;
@@ -285,24 +286,23 @@ void SeaField::scanShips()
        filled = 0;
    }
 
-   //проход по найденным кораблям
-   for (QMultiMap<int,Ship>::iterator it = _ships->begin(); it != _ships->end(); it++)
+   //восстановим "выстрелы" на кораблях
+   for (Point& p : *_shots)
    {
-       Ship ship = it.value();
+       Ship* FindShip = nullptr;
+       if (FindShipByPoint( p, FindShip))
+       {
+           FindShip->setDeckByPoint(p);
 
-       if (!ship.IsBroken()) continue;
+           //если корабль потоплен, обстреляем соседние точки
+           if (!FindShip->IsBroken()) continue;
 
-       //если корабль потоплен, обстреляем соседние точки
-        for (Point& p : getArroundPoint(ship))
-           {
-               QVector<Point>::iterator FindPoint = std::find(_shots->begin(), _shots->end(), p);
-
-               if (FindPoint == _shots->end())
-                   _shots->push_back(p);
-
-           }
+            for (Point& p : getArroundPoint(*FindShip))
+            {
+                _shots->push_back(p);
+            }
+       }
    }
-
 }
 
 void SeaField::clear()

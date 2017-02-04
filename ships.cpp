@@ -60,7 +60,7 @@ Point& Ship::getDeckByPoint(const Point& p)
 	return *FindPoint;
 }
 
-void Ship::setDeckByPoint(const Point& p, bool fill = true)
+void Ship::setDeckByPoint(const Point& p, bool fill)
 {
 	QVector<Point>::iterator FindPoint = std::find(_decks.begin(), _decks.end(), p);
 	

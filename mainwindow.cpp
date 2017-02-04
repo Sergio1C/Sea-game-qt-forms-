@@ -43,8 +43,8 @@ void MainWindow::on_actionNew_game_triggered()
 
         game->clearFields();
         game->GameInit = false;
+        game->GameStarted = false;
         repaint();
-        return;
     }
 
     game->initializeFields();
@@ -115,18 +115,6 @@ void MainWindow::repaint()
                     if (game->EndOfGame())
                         itemColor = ship;
                    }
-
-                /*
-                if (FindComputerShip->IsBroken())
-                {
-                    for (const Point& ArroundPoint : ComputerField->getArroundPoint(*FindComputerShip))
-                    {
-                        ComputerField->operator []()
-                        ui->tableWidgetLeft->item(ArroundPoint.x,ArroundPoint.y)->setIcon(QIcon(past));
-                    }
-                }
-                */
-
             }
 
            ui->tableWidgetLeft->item(row,col)->setIcon(QIcon(itemColor));

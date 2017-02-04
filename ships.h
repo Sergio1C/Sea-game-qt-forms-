@@ -41,7 +41,7 @@ public:
 
 	Point& getDeckByPoint(const Point& p);
 
-	void setDeckByPoint(const Point& p, bool fill);
+    void setDeckByPoint(const Point& p, bool fill = true);
 
     int getLenght() const
     {

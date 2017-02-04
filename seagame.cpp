@@ -125,12 +125,12 @@ void SeaGame::PlayerClick(int row, int column)
 
         if (PlayerShoot(p))
          {
-             PlayerField->scanShips();
+            ComputerField->scanShips();
          }
         else
          {
             ComputerShoot();
-            ComputerField->scanShips();
+            PlayerField->scanShips();
          }
     }
 
