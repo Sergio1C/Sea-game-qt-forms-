@@ -112,8 +112,7 @@ void MainWindow::repaint()
                     itemColor = cross; //deck is broken
                 else
                    {
-                    itemColor = ship; //для отладки
-
+                    //itemColor = ship; //for debug ships will is visible
                     if (game->EndOfGame())
                         itemColor = ship;
                    }
