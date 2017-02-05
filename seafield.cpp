@@ -169,9 +169,21 @@ bool SeaField::FindShipByPoint(const Point& p, Ship* &Result) const
 
 }
 
-uint SeaField::getShipCount() const
+uint SeaField::getShipCount(bool OnlyLives) const
 {
-    return _ships->count();
+    uint count = 0;
+    {
+        for (QMultiMap<int, Ship>::iterator it = _ships->begin(); it != _ships->end(); it++)
+        {
+            if (OnlyLives && !(it.value().IsBroken()))
+            {
+                count++;
+            }
+        count++;
+        }
+    }
+
+    return count;
 }
 
 QVector<Point> SeaField::getArroundPoint(const Ship& ship) const
@@ -181,9 +193,15 @@ QVector<Point> SeaField::getArroundPoint(const Ship& ship) const
 
     for (const Point& p : ship.getPoints())
     {
-        for (const Point& p2 : p.getArroundPoints(i,j))
+       QVector<Point> ArroundPoints_2 = p.getArroundPoints(i,j);
+
+        for (const Point& p2 : ArroundPoints_2)
         {
-            ArroundPoints.push_back(p2);
+            QVector<Point>::iterator FindArroundPoint = std::find(ArroundPoints.begin(), ArroundPoints.end(), p2);
+            if (FindArroundPoint == ArroundPoints.end())
+            {
+                ArroundPoints.push_back(p2);
+            }
         }
     }
 
@@ -299,7 +317,11 @@ void SeaField::scanShips()
 
             for (Point& p : getArroundPoint(*FindShip))
             {
-                _shots->push_back(p);
+                QVector<Point>::Iterator FindShot = std::find(_shots->begin(), _shots->end(), p);
+                if (FindShot == _shots->end())
+                {
+                    _shots->push_back(p);
+                }
             }
        }
    }

@@ -35,8 +35,7 @@ class SeaGame: public QObject
 		void SetPlayerShip();
         bool PlayerIsReady() const;
 
-	
-        void GameLoop();
+
         bool EndOfGame() const;
 
         bool PlayerShoot(const Point&);

@@ -137,32 +137,18 @@ void SeaGame::PlayerClick(int row, int column)
     RepaintForm();
 }
 
-void SeaGame::GameLoop()
-{
-    while (!EndOfGame())
-    {
-
-
-
-    }
-
-}
-
 bool SeaGame::PlayerShoot(const Point& In)
 {
      if (ComputerField->isNewShots(In))
      {
         Ship* FindShip;
-        if  (!ComputerField->FindShipByPoint(In,FindShip))
+        if  (ComputerField->FindShipByPoint(In,FindShip))
            {
-             return false;
-           }
-
-        //пробиваем палубу
-        FindShip->setDeckByPoint(In, true);
-
-        return true;
-
+            //пробиваем палубу
+            FindShip->setDeckByPoint(In, true);
+            return true;
+            }
+     return false;
      }
      return true;
 }
@@ -193,16 +179,37 @@ void SeaGame::ComputerShoot()
 
 bool SeaGame::EndOfGame() const
 {
+    bool AllPlayerShipIsBroken = false;
+    bool AllComputerShipIsBroken = false;
+
+    //if only all ship is broken, then game is over
     for (const Ship& s : PlayerField->getShip())
     {
-        if (!(s.IsBroken())) return false;
+        if (s.IsBroken())
+        {
+            AllPlayerShipIsBroken = true;
+        }
+        else
+        {
+            AllPlayerShipIsBroken = false;
+            break;
+        }
     }
 
     for (const Ship& s : ComputerField->getShip())
     {
-        if (!(s.IsBroken())) return false;
+        if (s.IsBroken())
+        {
+            AllComputerShipIsBroken = true;
+        }
+        else
+        {
+            AllComputerShipIsBroken = false;
+            break;
+        }
     }
 
-    return true;
+    return (AllPlayerShipIsBroken || AllComputerShipIsBroken);
+
 }
 

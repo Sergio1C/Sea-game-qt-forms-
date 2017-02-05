@@ -36,7 +36,7 @@ void MainWindow::on_actionNew_game_triggered()
     if (game->GameInit)
     {
         QMessageBox::StandardButton ret = QMessageBox::question(this,"",
-                                         "The Sea Game is now play.Close it and play again?",
+                                         tr("The Sea Game is now play.Close it and play again?"),
                                          QMessageBox::Yes | QMessageBox::No);
 
         if (ret == QMessageBox::No) return;
@@ -112,6 +112,8 @@ void MainWindow::repaint()
                     itemColor = cross; //deck is broken
                 else
                    {
+                    itemColor = ship; //для отладки
+
                     if (game->EndOfGame())
                         itemColor = ship;
                    }
@@ -160,6 +162,29 @@ void MainWindow::repaint()
         }
         else
         ui->statusbar->showMessage("click start game");
+
+        if (game->EndOfGame())
+        {
+            game->GameStarted = false;
+
+            uint PlayerShips = game->GetPlayerField()->getShipCount(true);
+            uint ComputerShips = game->GetComputerField()->getShipCount(true);
+
+            QString textMessage = QString(PlayerShips > ComputerShips ? "You win!" : "You lose...") + "\nTry again?";
+
+            QMessageBox msg(QMessageBox::Question,tr("The Game is Over"),textMessage);
+            msg.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            msg.setDefaultButton(QMessageBox::Yes);
+
+            int ret = msg.exec();
+
+            if (ret == QMessageBox::Yes)
+                {
+                 game->initializeFields();
+                 repaint();
+                 return;
+                }
+        }
 }
 
 

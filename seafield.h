@@ -44,7 +44,7 @@ public:
 
     bool FindShipByPoint(const Point& p, Ship* &Result) const;
 
-    uint getShipCount() const;
+    uint getShipCount(bool OnlyLives = false) const;
 
     //возвращает близлижайщие точки около корабля по границе с ним
     QVector<Point> getArroundPoint(const Ship& someShip) const;
